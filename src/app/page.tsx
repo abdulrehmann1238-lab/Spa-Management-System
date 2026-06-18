@@ -207,10 +207,18 @@ export default function RootPage() {
   return (
     <div className="min-h-screen flex text-charcoal font-sans relative overflow-hidden bg-background-marble">
       
+      {/* Backdrop overlay on mobile when sidebar is open */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-charcoal/20 backdrop-blur-xs z-30 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+      
       {/* Sidebar Navigation */}
       <aside 
-        className={`bg-white border-r border-beige-100/60 shadow-premium flex flex-col justify-between transition-all duration-300 z-30 flex-shrink-0 ${
-          sidebarOpen ? 'w-[260px]' : 'w-0 -translate-x-full md:w-20 md:translate-x-0'
+        className={`fixed md:static inset-y-0 left-0 bg-white border-r border-beige-100/60 shadow-premium flex flex-col justify-between transition-all duration-300 z-40 flex-shrink-0 ${
+          sidebarOpen ? 'w-[260px] translate-x-0' : '-translate-x-full md:translate-x-0 w-[260px] md:w-20'
         }`}
       >
         <div className="flex flex-col h-full overflow-hidden">
@@ -226,6 +234,14 @@ export default function RootPage() {
                 </span>
               )}
             </div>
+            {sidebarOpen && (
+              <button 
+                onClick={() => setSidebarOpen(false)}
+                className="p-1 rounded-lg hover:bg-beige-50 md:hidden transition-all text-charcoal-muted"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            )}
           </div>
 
           {/* Navigation Accordion List */}
@@ -261,7 +277,12 @@ export default function RootPage() {
                         {group.items.map(item => (
                           <button 
                             key={item.id}
-                            onClick={() => setView(item.id)}
+                            onClick={() => {
+                              setView(item.id);
+                              if (window.innerWidth < 768) {
+                                setSidebarOpen(false);
+                              }
+                            }}
                             className={`w-full text-left py-1.5 px-3 rounded-lg text-xs transition-all font-light ${
                               currentView === item.id 
                                 ? 'bg-sage-50 text-sage-800 border-l-2 border-sage-600 font-medium' 
@@ -298,8 +319,8 @@ export default function RootPage() {
       <div className="flex-1 flex flex-col min-w-0 h-screen overflow-hidden">
         
         {/* Top Header Bar */}
-        <header className="h-20 bg-white border-b border-beige-100/40 flex items-center justify-between px-6 md:px-8 z-20 flex-shrink-0">
-          <div className="flex items-center gap-4 flex-1 max-w-lg relative">
+        <header className="h-20 bg-white border-b border-beige-100/40 flex items-center justify-between px-4 md:px-8 z-20 flex-shrink-0">
+          <div className="flex items-center gap-3 flex-1 max-w-lg relative">
             <button 
               onClick={() => setSidebarOpen(!sidebarOpen)}
               className="p-2 border border-beige-100 rounded-lg hover:bg-beige-50 transition-all interactive-scale"
@@ -308,11 +329,11 @@ export default function RootPage() {
             </button>
             
             {/* Search Input Bar */}
-            <div className="flex items-center gap-2.5 border border-beige-100 rounded-xl px-3 py-2 flex-1 max-w-sm relative">
+            <div className="flex items-center gap-2 border border-beige-100 rounded-xl px-3 py-1.5 flex-1 max-w-sm relative">
               <Search className="h-4 w-4 text-charcoal-muted" />
               <input 
                 type="text" 
-                placeholder="Jump instantly to any of the 50 pages..." 
+                placeholder="Search 50 views..." 
                 value={searchVal}
                 onChange={e => {
                   setSearchVal(e.target.value);
@@ -407,7 +428,7 @@ export default function RootPage() {
         </header>
 
         {/* Content canvas area */}
-        <main className="flex-1 overflow-y-auto p-6 md:p-8">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8">
           <div className="max-w-7xl mx-auto space-y-6">
             
             {/* View Breadcrumb / Header Title */}
